@@ -9,8 +9,11 @@ public class EntityValidator {
             throw new NullPointerException("Validator class can not be null");
         }
         Class<?> type = object.getClass();
-        if (type.isAnnotationPresent(Validator.class)) {
-            Class<?> validatorClass = type.getAnnotation(Validator.class).value();
+        if (type.isAnnotationPresent(Validate.class)) {
+            Class<?> validatorClass = type.getAnnotation(Validate.class).value();
+            if (validatorClass == NoValidator.class)
+                return;
+
             Object validatorEntity = validatorClass.getConstructor().newInstance();
             Class<?> abstractValidator = validatorClass.getSuperclass();
             if (abstractValidator != AbstractValidator.class) {

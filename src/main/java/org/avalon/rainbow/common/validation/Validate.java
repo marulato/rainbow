@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Validator {
+public @interface Validate {
 
-    Class<? extends AbstractValidator> value();
+    Class<? extends AbstractValidator> value() default NoValidator.class;
 }
