@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-public abstract class BasePO implements Serializable, Cloneable {
+public abstract class BasePO implements Serializable {
 
     private Date createdAt;
     private String createdBy;
@@ -12,11 +12,6 @@ public abstract class BasePO implements Serializable, Cloneable {
     private Date updatedAt;
     private String updatedBy;
     private String updatedDm;
-
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 
     public final void createAuditValues(AppContext context) {
         if (context != null) {

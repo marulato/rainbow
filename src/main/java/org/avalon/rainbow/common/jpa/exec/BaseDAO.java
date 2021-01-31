@@ -8,7 +8,7 @@ import org.avalon.rainbow.common.utils.StringUtils;
 import java.lang.reflect.Field;
 import java.util.Date;
 
-public class DAO {
+public class BaseDAO {
 
     private static final IExecutor executor = SpringUtils.getBean(IExecutor.class);
 
@@ -19,7 +19,9 @@ public class DAO {
             entity.setCreatedAt(now);
             entity.setUpdatedAt(now);
             entity.setCreatedBy(appContext.getUserId());
+            entity.setCreatedDm(appContext.getDomain());
             entity.setUpdatedBy(appContext.getUserId());
+            entity.setUpdatedDm(appContext.getDomain());
             formatEmptyString(entity);
             executor.insert(entity);
         }
@@ -31,6 +33,7 @@ public class DAO {
             AppContext appContext = AppContext.getFromWebThread();
             entity.setUpdatedAt(now);
             entity.setUpdatedBy(appContext.getUserId());
+            entity.setUpdatedDm(appContext.getDomain());
             formatEmptyString(entity);
             executor.update(entity);
         }

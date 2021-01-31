@@ -11,7 +11,9 @@ public @interface Length {
 
     int max() default Integer.MAX_VALUE;
 
-    String message();
+    String message() default "";
+
+    String errorCode() default "err.default";
 
     String[] profile() default {};
 }

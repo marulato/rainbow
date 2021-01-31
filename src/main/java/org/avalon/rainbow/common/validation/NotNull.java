@@ -7,7 +7,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotNull {
 
-    String message();
+    String message() default "";
+
+    String errorCode() default "err.default";
 
     String[] profile() default {};
 }

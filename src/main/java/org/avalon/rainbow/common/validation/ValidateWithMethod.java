@@ -13,14 +13,16 @@ public @interface ValidateWithMethod {
 
     String[] parameters() default {};
 
-    String message();
+    String message() default "";
+
+    String errorCode() default "err.default";
 
     String[] profile() default {};
 
     @Target(ElementType.FIELD)
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
-    @interface List {
+    @interface Group {
         ValidateWithMethod[] value();
     }
 }

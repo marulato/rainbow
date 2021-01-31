@@ -7,5 +7,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PrimaryKey {
 
-    boolean autoIncrement();
+    boolean autoIncrement() default true;
 }

@@ -6,6 +6,10 @@ public class NumberUtils {
         return id != null && id > 0;
     }
 
+    public static boolean isPositive(Integer id) {
+        return id != null && id > 0;
+    }
+
     public static boolean isZero(Long id) {
         return id != null && id == 0;
     }

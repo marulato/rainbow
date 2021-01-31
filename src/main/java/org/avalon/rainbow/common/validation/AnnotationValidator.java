@@ -1,9 +1,7 @@
 package org.avalon.rainbow.common.validation;
 
-import org.avalon.rainbow.common.utils.DateUtils;
-import org.avalon.rainbow.common.utils.Reflections;
-import org.avalon.rainbow.common.utils.StringUtils;
-import org.avalon.rainbow.common.utils.ValidationUtils;
+import org.avalon.rainbow.common.utils.*;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -89,8 +87,8 @@ public class AnnotationValidator {
     private static void checkAnnotation_ValidateWithMethod(ConstraintField constraintField,
                                                            final List<ConstraintViolation> violations) throws Exception {
         Field field = constraintField.getField();
-        if (constraintField.isAnnotationPresent(ValidateWithMethod.List.class)) {
-            ValidateWithMethod.List list = field.getAnnotation(ValidateWithMethod.List.class);
+        if (constraintField.isAnnotationPresent(ValidateWithMethod.Group.class)) {
+            ValidateWithMethod.Group list = field.getAnnotation(ValidateWithMethod.Group.class);
             ValidateWithMethod[] vars = list.value();
             for (ValidateWithMethod var : vars) {
                 validateWithMethod(field, var, constraintField.getInputProfile(), constraintField.getInstanceBelongsTo(), violations);
@@ -125,7 +123,8 @@ public class AnnotationValidator {
                 boolean result = (boolean) method.invoke(methodInstance, argsList.toArray());
                 if (!result) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            validateWithMethod.message(), validateWithMethod.profile(), ValidateWithMethod.class));
+                            getMessage(validateWithMethod.errorCode(), validateWithMethod.message()),
+                            validateWithMethod.profile(), ValidateWithMethod.class));
                 }
             } else {
                 throw new NoSuchMethodException("Could not find a method that meets the requirements described by '@ValidateWithMethod'");
@@ -141,7 +140,7 @@ public class AnnotationValidator {
             if (isProfileMatch(constraintField.getInputProfile(), assertNull.profile())) {
                 if (Reflections.getValue(field, constraintField.getInstanceBelongsTo()) != null) {
                     violations.add(new ConstraintViolation(field.getName(), null,
-                            assertNull.message(), assertNull.profile(), NotNull.class));
+                            getMessage(assertNull.errorCode(), assertNull.message()), assertNull.profile(), NotNull.class));
                 }
             }
         }
@@ -155,7 +154,7 @@ public class AnnotationValidator {
             if (isProfileMatch(constraintField.getInputProfile(), notNull.profile())) {
                 if (Reflections.getValue(field, constraintField.getInstanceBelongsTo()) == null) {
                     violations.add(new ConstraintViolation(field.getName(), null,
-                            notNull.message(), notNull.profile(), NotNull.class));
+                            getMessage(notNull.errorCode(), notNull.message()), notNull.profile(), NotNull.class));
                 }
             }
         }
@@ -170,7 +169,7 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (value == null || StringUtils.isEmpty(String.valueOf(value))) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            notEmpty.message(), notEmpty.profile(), NotNull.class));
+                            getMessage(notEmpty.errorCode(), notEmpty.message()), notEmpty.profile(), NotNull.class));
                 }
             }
         }
@@ -185,7 +184,7 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (value == null || StringUtils.isBlank(String.valueOf(value))) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            notBlank.message(), notBlank.profile(), NotBlank.class));
+                            getMessage(notBlank.errorCode(), notBlank.message()), notBlank.profile(), NotBlank.class));
                 }
             }
         }
@@ -201,7 +200,7 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !members.contains(String.valueOf(value))) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            memberOf.message(), memberOf.profile(), MemberOf.class));
+                            getMessage(memberOf.errorCode(), memberOf.message()), memberOf.profile(), MemberOf.class));
                 }
             }
         }
@@ -217,7 +216,7 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || members.contains(String.valueOf(value))) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            notMemberOf.message(), notMemberOf.profile(), NotMemberOf.class));
+                            getMessage(notMemberOf.errorCode(), notMemberOf.message()), notMemberOf.profile(), NotMemberOf.class));
                 }
             }
         }
@@ -233,7 +232,8 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !pattern.matcher(String.valueOf(value)).matches()) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            matchesPattern.message(), matchesPattern.profile(), MatchesPattern.class));
+                            getMessage(matchesPattern.errorCode(), matchesPattern.message()),
+                            matchesPattern.profile(), MatchesPattern.class));
                 }
             }
         }
@@ -252,7 +252,7 @@ public class AnnotationValidator {
                 if (!(value instanceof String) || ((String) value).length() < length.min()
                         || ((String) value).length() > length.max()) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            length.message(), length.profile(), Length.class));
+                            getMessage(length.errorCode(), length.message()), length.profile(), Length.class));
                 }
             }
         }
@@ -267,7 +267,7 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !ValidationUtils.isValidEmail((String) value)) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            email.message(), email.profile(), Email.class));
+                            getMessage(email.errorCode(), email.message()), email.profile(), Email.class));
                 }
             }
         }
@@ -282,10 +282,23 @@ public class AnnotationValidator {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || DateUtils.parseDatetime((String) value, date.pattern()) == null) {
                     violations.add(new ConstraintViolation(field.getName(), value,
-                            date.message(), date.profile(), Date.class));
+                            getMessage(date.errorCode(), date.message()), date.profile(), Date.class));
                 }
             }
         }
+    }
+
+    private static String getMessage(String errorCode, String message) {
+        if ("err.default".equals(errorCode)) {
+            return StringUtils.isEmpty(message) ? "Invalid Value" : message;
+        }
+        String[] errorKeys = errorCode.split(",");
+        for (int i = 0; i < errorKeys.length; i++) {
+            errorKeys[i] = errorKeys[i].trim();
+        }
+        String[] replacements = ArrayUtils.extract(errorKeys, 1, errorKeys.length - 1);
+        String errorMsg = MessageUtils.getMessage(errorKeys[0], replacements);
+        return StringUtils.isEmpty(errorMsg) ? "Invalid Value" : errorMsg;
     }
 
 }
