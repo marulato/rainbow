@@ -1,27 +1,19 @@
 package org.avalon.rainbow.admin.entity;
 
 import org.avalon.rainbow.common.base.BasePO;
-import org.avalon.rainbow.common.jpa.annotation.Entity;
-import org.avalon.rainbow.common.jpa.annotation.PrimaryKey;
 
-@Entity(tableName = "CM_MESSAGE")
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "CM_MESSAGE")
 public class Message extends BasePO {
 
-    @PrimaryKey
-    private Integer id;
     private String msgKey;
     private String type;
     private String msgValue;
     private String dftValue;
     private String remarks;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getMsgKey() {
         return msgKey;

@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/unity?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&charset=utf8
-    username: test
+    url: jdbc:mysql://localhost:3306/rainbow?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&charset=utf8
+    username: yuzhou
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -37,8 +37,11 @@ spring:
 #    cache: false
 #    encoding: UTF-8
 
-mybatis:
-  mapper-locations: classpath*:sql/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      naming:
+        physical-strategy: org.avalon.rainbow.common.jpa.RainbowStandardNamingStrategy

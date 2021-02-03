@@ -1,16 +1,15 @@
 package org.avalon.rainbow.admin.entity;
 
 import org.avalon.rainbow.common.base.BasePO;
-import org.avalon.rainbow.common.jpa.annotation.Entity;
-import org.avalon.rainbow.common.jpa.annotation.PrimaryKey;
 import org.avalon.rainbow.common.validation.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-@Entity(tableName = "CM_MASTER_CODE")
+@Entity
+@Table(name = "CM_MASTER_CODE")
 public class MasterCode extends BasePO {
 
-    @PrimaryKey
-    private Integer id;
-    @NotNull(errorCode = "cm.mandatory,  bigdick")
+    @NotNull(errorCode = "cm.mandatory")
     private String codeType;
     private String code;
     private String value;
@@ -18,14 +17,6 @@ public class MasterCode extends BasePO {
     private String remarks;
     private String isConfigurable;
     private Integer displayOrder;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getCodeType() {
         return codeType;

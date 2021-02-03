@@ -3,20 +3,19 @@ package org.avalon.rainbow.common.cache;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.avalon.rainbow.admin.entity.MasterCode;
-import org.avalon.rainbow.admin.service.MasterCodeService;
+import org.avalon.rainbow.admin.repository.impl.MasterCodeDAO;
 import org.avalon.rainbow.common.utils.BeanUtils;
 import org.avalon.rainbow.common.utils.NumberUtils;
 import org.avalon.rainbow.common.utils.SpringUtils;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-public class MasterCodeCache implements ICache<Integer, MasterCode> {
+public class MasterCodeCache implements ICache<Long, MasterCode> {
 
-    private static final Cache<Integer, MasterCode> idCache = CacheBuilder.newBuilder().build();
+    private static final Cache<Long, MasterCode> idCache = CacheBuilder.newBuilder().build();
     private static final Cache<String, List<MasterCode>> typeCache = CacheBuilder.newBuilder().build();
 
-    public MasterCodeCache getInstance() {
+    public static MasterCodeCache getInstance() {
         if (idCache.size() == 0 || typeCache.size() == 0) {
             return new MasterCodeCache(true);
         } else {
@@ -34,8 +33,8 @@ public class MasterCodeCache implements ICache<Integer, MasterCode> {
     public void init() {
         idCache.invalidateAll();
         typeCache.invalidateAll();
-        MasterCodeService service = SpringUtils.getBean(MasterCodeService.class);
-        List<MasterCode> masterCodeList = service.selectAll();
+        MasterCodeDAO dao = SpringUtils.getBean(MasterCodeDAO.class);
+        List<MasterCode> masterCodeList = dao.findAll();
         for (MasterCode masterCode : masterCodeList) {
             idCache.put(masterCode.getId(), masterCode);
             updateTypeCache(masterCode);
@@ -43,7 +42,7 @@ public class MasterCodeCache implements ICache<Integer, MasterCode> {
     }
 
     @Override
-    public MasterCode get(Integer key) {
+    public MasterCode get(Long key) {
         return BeanUtils.deepClone(idCache.getIfPresent(key));
     }
 
@@ -60,7 +59,7 @@ public class MasterCodeCache implements ICache<Integer, MasterCode> {
     }
 
     @Override
-    public void update(Integer key, MasterCode value) {
+    public void update(Long key, MasterCode value) {
         if (NumberUtils.isPositive(key) && value != null) {
             idCache.put(key, value);
             updateTypeCache(value);
@@ -68,7 +67,7 @@ public class MasterCodeCache implements ICache<Integer, MasterCode> {
     }
 
     @Override
-    public void remove(Integer key) {
+    public void remove(Long key) {
         MasterCode masterCode = idCache.getIfPresent(key);
         if (masterCode != null) {
             idCache.invalidate(key);

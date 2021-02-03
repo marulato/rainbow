@@ -3,7 +3,7 @@ package org.avalon.rainbow.common.cache;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.avalon.rainbow.admin.entity.Message;
-import org.avalon.rainbow.admin.service.MessageService;
+import org.avalon.rainbow.admin.repository.impl.MessageDAO;
 import org.avalon.rainbow.common.utils.BeanUtils;
 import org.avalon.rainbow.common.utils.SpringUtils;
 import org.avalon.rainbow.common.utils.StringUtils;
@@ -30,8 +30,8 @@ public class MessageCache implements ICache<String , Message> {
     @Override
     public void init() {
         cache.invalidateAll();
-        MessageService service = SpringUtils.getBean(MessageService.class);
-        List<Message> messageList = service.selectAll();
+        MessageDAO dao = SpringUtils.getBean(MessageDAO.class);
+        List<Message> messageList = dao.findAll();
         for (Message message : messageList) {
             cache.put(message.getMsgKey(), message);
         }
