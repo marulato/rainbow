@@ -57,11 +57,11 @@ public class AppContext implements Serializable {
         }
     }
 
-    public void setLocalAppContext() {
+    public void createLocalAppContext() {
         localContext.set(this);
     }
 
-    public AppContext getLocalAppContext() {
+    public static AppContext getLocalAppContext() {
         return localContext.get();
     }
 

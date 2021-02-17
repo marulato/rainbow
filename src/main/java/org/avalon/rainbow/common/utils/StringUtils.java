@@ -90,8 +90,9 @@ public class StringUtils {
     public static String [] splitByUpperCase(String property) {
         char[] chars = property.toCharArray();
         StringBuilder fragment = new StringBuilder();
-        for (char ch : chars) {
-            if (ch >= 'A' && ch <= 'Z') {
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            if (i > 0 && ch >= 'A' && ch <= 'Z') {
                 fragment.append("_");
             }
             fragment.append(ch);

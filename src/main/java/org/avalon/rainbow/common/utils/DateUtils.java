@@ -22,18 +22,6 @@ public class DateUtils {
     public static final long ONE_HOUR_MILLIS				= 60 * 60 * 1000;
     public static final List<String> COMMON_FORMAT = List.of(FULL_STD_FORMAT_1, FULL_STD_FORMAT_2, STD_FORMAT_1,
                                 STD_FORMAT_2, TODAY_FORMAT, SLASH_TODAY_FORMAT, US_TODAY_FORMAT, ENG_TODAY_FORMAT, TIME_SHORT);
-    private static final Map<String, String> timeUnitMap;
-
-    static {
-        timeUnitMap = new HashMap<>();
-        timeUnitMap.put("S", "毫秒");
-        timeUnitMap.put("s", "秒");
-        timeUnitMap.put("m", "分钟");
-        timeUnitMap.put("h", "小时");
-        timeUnitMap.put("d", "天");
-        timeUnitMap.put("M", "个月");
-        timeUnitMap.put("y", "年");
-    }
 
     public static Date parseDatetime(String dateStr) {
         if (!StringUtils.isEmpty(dateStr)) {
@@ -380,10 +368,6 @@ public class DateUtils {
             }
         }
         return null;
-    }
-
-    public static String getTimeUnit(String shortName) {
-        return timeUnitMap.get(shortName);
     }
 
     public static Date truncate(Date date) {

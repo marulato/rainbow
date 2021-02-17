@@ -26,11 +26,11 @@ public class Reflections {
         return value;
     }
 
-    public static void setValue(Field field, Object instance, Object value) throws Exception {
+    public static void setSuperValue(Field field, Object instance, Object value, Class<?> superClass) throws Exception {
         String setter = "set";
         field.setAccessible(true);
         setter += StringUtils.capitalCharacter(field.getName(), 0);
-        Method setterMethod = instance.getClass().getDeclaredMethod(setter, field.getType());
+        Method setterMethod = superClass.getDeclaredMethod(setter, field.getType());
         int modifier = setterMethod.getModifiers();
         if (Modifier.isPublic(modifier) && !Modifier.isAbstract(modifier)
                 && !Modifier.isStatic(modifier)) {
@@ -39,5 +39,9 @@ public class Reflections {
         } else {
             field.set(instance, value);
         }
+    }
+
+    public static void setValue(Field field, Object instance, Object value) throws Exception {
+        setSuperValue(field, instance, value, instance.getClass());
     }
 }

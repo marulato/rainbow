@@ -1,22 +1,21 @@
 package org.avalon.rainbow.admin.repository.impl;
 
-import org.apache.commons.collections4.IterableUtils;
 import org.avalon.rainbow.admin.entity.Message;
 import org.avalon.rainbow.admin.repository.MessageRepository;
+import org.avalon.rainbow.common.jpa.CrudDAO;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public class MessageDAO {
+public class MessageDAO extends CrudDAO<Message, Long, MessageRepository> {
 
-    private final MessageRepository messageRepository;
+    private final MessageRepository repository;
 
-    public MessageDAO(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
+    protected MessageDAO(MessageRepository crudRepository) {
+        super(crudRepository);
+        this.repository = crudRepository;
     }
 
-    public List<Message> findAll() {
-        return IterableUtils.toList(messageRepository.findAll());
+    public Message findByKey(String key) {
+        return repository.findMessageByMsgKey(key);
     }
 }

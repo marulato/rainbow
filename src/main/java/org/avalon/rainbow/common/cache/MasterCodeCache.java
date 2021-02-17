@@ -6,34 +6,29 @@ import org.avalon.rainbow.admin.entity.MasterCode;
 import org.avalon.rainbow.admin.repository.impl.MasterCodeDAO;
 import org.avalon.rainbow.common.utils.BeanUtils;
 import org.avalon.rainbow.common.utils.NumberUtils;
-import org.avalon.rainbow.common.utils.SpringUtils;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+@DependsOn({"beanUtils", "masterCodeDAO"})
 public class MasterCodeCache implements ICache<Long, MasterCode> {
 
     private static final Cache<Long, MasterCode> idCache = CacheBuilder.newBuilder().build();
     private static final Cache<String, List<MasterCode>> typeCache = CacheBuilder.newBuilder().build();
 
-    public static MasterCodeCache getInstance() {
-        if (idCache.size() == 0 || typeCache.size() == 0) {
-            return new MasterCodeCache(true);
-        } else {
-            return new MasterCodeCache(false);
-        }
-    }
 
-    private MasterCodeCache(boolean init) {
-        if (init) {
-            init();
-        }
+    public MasterCodeCache() {
+        init();
     }
 
     @Override
     public void init() {
         idCache.invalidateAll();
         typeCache.invalidateAll();
-        MasterCodeDAO dao = SpringUtils.getBean(MasterCodeDAO.class);
+        MasterCodeDAO dao = BeanUtils.getBean(MasterCodeDAO.class);
         List<MasterCode> masterCodeList = dao.findAll();
         for (MasterCode masterCode : masterCodeList) {
             idCache.put(masterCode.getId(), masterCode);

@@ -1,7 +1,7 @@
 package org.avalon.rainbow.common.validation;
 
+import org.avalon.rainbow.admin.service.CommonService;
 import org.avalon.rainbow.common.utils.*;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -297,7 +297,7 @@ public class AnnotationValidator {
             errorKeys[i] = errorKeys[i].trim();
         }
         String[] replacements = ArrayUtils.extract(errorKeys, 1, errorKeys.length - 1);
-        String errorMsg = MessageUtils.getMessage(errorKeys[0], replacements);
+        String errorMsg = CommonService.getMessage(errorKeys[0], replacements);
         return StringUtils.isEmpty(errorMsg) ? "Invalid Value" : errorMsg;
     }
 

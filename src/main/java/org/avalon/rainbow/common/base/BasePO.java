@@ -22,6 +22,8 @@ public abstract class BasePO implements Serializable {
             Date now = new Date();
             setCreatedBy(context.getUserId());
             setUpdatedBy(context.getUserId());
+            setCreatedDm(context.getDomain());
+            setUpdatedDm(context.getDomain());
             setCreatedAt(now);
             setUpdatedAt(now);
         }
@@ -31,6 +33,7 @@ public abstract class BasePO implements Serializable {
         if (context != null) {
             Date now = new Date();
             setUpdatedBy(context.getUserId());
+            setUpdatedDm(context.getDomain());
             setUpdatedAt(now);
         }
     }
