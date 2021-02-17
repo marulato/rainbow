@@ -20,7 +20,7 @@ public class MasterCodeCache implements ICache<Long, MasterCode> {
     private static final Cache<String, List<MasterCode>> typeCache = CacheBuilder.newBuilder().build();
 
 
-    public MasterCodeCache() {
+    private MasterCodeCache() {
         init();
     }
 

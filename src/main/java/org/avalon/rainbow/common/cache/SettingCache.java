@@ -16,7 +16,7 @@ public class SettingCache implements ICache<String, Setting> {
 
     private static final Cache<String, Setting> cache = CacheBuilder.newBuilder().build();
 
-    public SettingCache() {
+    private SettingCache() {
         init();
     }
 

@@ -17,7 +17,7 @@ public class MessageCache implements ICache<String , Message> {
 
     private static final Cache<String, Message> cache = CacheBuilder.newBuilder().build();
 
-    public MessageCache() {
+    private MessageCache() {
         init();
     }
 

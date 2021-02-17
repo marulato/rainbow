@@ -4,8 +4,10 @@ import org.avalon.rainbow.admin.entity.Message;
 import org.avalon.rainbow.admin.entity.Setting;
 import org.avalon.rainbow.admin.repository.impl.MessageDAO;
 import org.avalon.rainbow.common.cache.MessageCache;
+import org.avalon.rainbow.common.cache.PropertiesCache;
 import org.avalon.rainbow.common.cache.SettingCache;
 import org.avalon.rainbow.common.utils.BeanUtils;
+import org.avalon.rainbow.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.text.MessageFormat;
@@ -38,6 +40,11 @@ public class CommonService {
     }
 
     public static String getSetting(String key, String defaultValue) {
+        PropertiesCache propertiesCache = BeanUtils.getBean(PropertiesCache.class);
+        String value = propertiesCache.get(key);
+        if (StringUtils.isNotEmpty(value)) {
+            return value;
+        }
         SettingCache cache = BeanUtils.getBean(SettingCache.class);
         Setting setting = cache.get(key);
         if (setting != null) {
