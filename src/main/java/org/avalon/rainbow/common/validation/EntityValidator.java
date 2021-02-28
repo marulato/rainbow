@@ -19,7 +19,7 @@ public class EntityValidator {
             if (abstractValidator != AbstractValidator.class) {
                 throw new IllegalArgumentException("Validator class NOT Supported");
             }
-            Method method = abstractValidator.getMethod("validate", Object.class);
+            Method method = abstractValidator.getMethod("askForException", Object.class);
             method.invoke(validatorEntity, object);
         }
     }

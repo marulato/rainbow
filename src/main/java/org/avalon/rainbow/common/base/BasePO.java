@@ -1,5 +1,7 @@
 package org.avalon.rainbow.common.base;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
@@ -9,6 +11,7 @@ import java.util.Date;
 public abstract class BasePO implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Date createdAt;
     private String createdBy;

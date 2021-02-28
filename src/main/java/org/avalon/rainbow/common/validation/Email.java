@@ -7,8 +7,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Email {
 
-    String value();
-
     String message() default "";
 
     String errorCode() default "err.default";

@@ -20,9 +20,15 @@ public class AppContext implements Serializable {
 
     public static AppContext getFromWebThread() {
 
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes)
-                RequestContextHolder.currentRequestAttributes();
-        return (AppContext) requestAttributes.getRequest().getSession().getAttribute(APP_CONTEXT_KEY);
+        AppContext context = null;
+        try {
+            ServletRequestAttributes requestAttributes = (ServletRequestAttributes)
+                    RequestContextHolder.currentRequestAttributes();
+            context = (AppContext) requestAttributes.getRequest().getSession().getAttribute(APP_CONTEXT_KEY);
+        } catch (Exception e) {
+            context = getLocalAppContext();
+        }
+        return context;
     }
 
     public static AppContext getAppContext(HttpServletRequest request) {

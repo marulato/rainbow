@@ -14,28 +14,36 @@ public abstract class CrudDAO <T extends BasePO, ID, E extends CrudRepository<T,
         this.crudRepository = crudRepository;
     }
 
-    public void save(T po) {
+    public void save(T po, AppContext appContext) {
         if (po != null) {
             if (po.getId() != null && po.getId() > 0) {
-                po.updateAuditValues(AppContext.getFromWebThread());
+                po.updateAuditValues(appContext);
             } else {
-                po.createAuditValues(AppContext.getFromWebThread());
+                po.createAuditValues(appContext);
             }
             crudRepository.save(po);
         }
     }
 
-    public void saveAll(List<T> list) {
+    public void save(T po) {
+        save(po, AppContext.getFromWebThread());
+    }
+
+    public void saveAll(List<T> list, AppContext appContext) {
         if (list != null) {
             for (T t : list) {
                 if (t.getId() != null && t.getId() > 0) {
-                    t.updateAuditValues(AppContext.getFromWebThread());
+                    t.updateAuditValues(appContext);
                 } else {
-                    t.createAuditValues(AppContext.getFromWebThread());
+                    t.createAuditValues(appContext);
                 }
             }
             crudRepository.saveAll(list);
         }
+    }
+
+    public void saveAll(List<T> list) {
+        saveAll(list, AppContext.getFromWebThread());
     }
 
     public List<T> findAll() {
