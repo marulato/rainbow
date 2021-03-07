@@ -9,7 +9,7 @@ import java.util.*;
 
 public class EmailObject implements Serializable {
 
-    @NotBlank(errorCode = "cm.mandatory")
+    @NotBlank(errorCode = "err.mandatory")
     @Length(max = 160)
     private String subject;
 
@@ -19,7 +19,7 @@ public class EmailObject implements Serializable {
     @ValidateWithMethod(methodName = "validateCcs")
     private List<String> ccs;
 
-    @NotEmpty(errorCode = "cm.mandatory")
+    @NotEmpty(errorCode = "err.mandatory")
     @ValidateWithMethod(methodName = "validateContent")
     private String content;
 

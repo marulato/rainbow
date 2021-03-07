@@ -1,13 +1,11 @@
 package org.avalon.rainbow.admin.service;
 
-import org.avalon.rainbow.admin.entity.EmailObject;
-import org.avalon.rainbow.admin.entity.EmailTransaction;
-import org.avalon.rainbow.admin.entity.Message;
-import org.avalon.rainbow.admin.entity.Setting;
+import org.avalon.rainbow.admin.entity.*;
 import org.avalon.rainbow.admin.repository.impl.EmailTransactionDAO;
 import org.avalon.rainbow.admin.repository.impl.MessageDAO;
 import org.avalon.rainbow.common.aop.validation.RequiresValidation;
 import org.avalon.rainbow.common.base.AppContext;
+import org.avalon.rainbow.common.cache.MasterCodeCache;
 import org.avalon.rainbow.common.cache.MessageCache;
 import org.avalon.rainbow.common.cache.PropertiesCache;
 import org.avalon.rainbow.common.cache.SettingCache;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -74,6 +73,11 @@ public class CommonService {
 
     public Message getMessageByKey(String key)  {
         return messageDAO.findByKey(key);
+    }
+
+    public List<MasterCode> getMasterCodeByType(String type) {
+        MasterCodeCache cache = BeanUtils.getBean(MasterCodeCache.class);
+        return cache.get(type);
     }
 
     @RequiresValidation

@@ -63,6 +63,9 @@ public class AnnotationValidator {
             checkAnnotation_MatchesPattern(constraintField, violations);
         }
         if (violations.isEmpty()) {
+            checkAnnotation_MasterCode(constraintField, violations);
+        }
+        if (violations.isEmpty()) {
             checkAnnotation_MemberOf(constraintField, violations);
         }
         if (violations.isEmpty()) {
@@ -285,6 +288,25 @@ public class AnnotationValidator {
                             getMessage(date.errorCode(), date.message()), date.profile(), Date.class));
                 }
             }
+        }
+    }
+
+    private static void checkAnnotation_MasterCode(final ConstraintField constraintField,
+                                                   final List<ConstraintViolation> violations) throws Exception {
+        if (constraintField.isAnnotationPresent(MasterCode.class)) {
+            Field field = constraintField.getField();
+            MasterCode masterCode = field.getAnnotation(MasterCode.class);
+            String type = masterCode.type();
+            CommonService commonService = BeanUtils.getBean(CommonService.class);
+            List<org.avalon.rainbow.admin.entity.MasterCode> masterCodeList = commonService.getMasterCodeByType(type);
+            Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
+            for (org.avalon.rainbow.admin.entity.MasterCode code : masterCodeList) {
+                if (code.getCode().equals(value)) {
+                    return;
+                }
+            }
+            violations.add(new ConstraintViolation(field.getName(), value,
+                    getMessage(masterCode.errorCode(), masterCode.message()), masterCode.profile(), MasterCode.class));
         }
     }
 

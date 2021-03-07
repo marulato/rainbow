@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Table(name = "CM_MASTER_CODE")
 public class MasterCode extends BasePO {
 
-    @NotNull(errorCode = "cm.mandatory")
+    @NotNull(errorCode = "err.mandatory")
     private String codeType;
     private String code;
     private String value;

@@ -7,6 +7,8 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerFontProvider;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+import org.avalon.rainbow.admin.service.TemplateService;
+import org.avalon.rainbow.common.utils.BeanUtils;
 import org.avalon.rainbow.common.utils.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -28,7 +30,20 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
     private int headerAlignment = 1;
     private String footer;
     private int footerAlignment = 1;
-    private String font = "styles/simhei.ttf";
+    //private String font = "styles/JetBrainsMono.ttf";
+    private static final TemplateEngine templateEngine;
+    private static final ClassLoaderTemplateResolver resolver;
+
+    static  {
+        templateEngine = new TemplateEngine();
+        resolver = new ClassLoaderTemplateResolver();
+        resolver.setCharacterEncoding("UTF-8");
+        resolver.setPrefix("templates/");
+        resolver.setSuffix(".html");
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setCacheable(true);
+        templateEngine.setTemplateResolver(resolver);
+    }
 
     protected byte[] generatePdf(byte[] content) throws Exception {
         Document document = new Document();
@@ -39,11 +54,11 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
             pdfWriter.setPageEvent(initHeaderFooter());
         }
         document.open();
-        if (StringUtils.isBlank(font)) {
-            font = "styles/simhei.ttf";
+/*        if (StringUtils.isBlank(font)) {
+            font = "styles/JetBrainsMono.ttf";
         }
         XMLWorkerFontProvider fontProvider = new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
-        fontProvider.register(font);
+        fontProvider.register(font);*/
         String cssPath = this.getClass().getResource("/").getPath();
         cssPath = cssPath.replaceAll("%20", " ") + "styles/doc.css";
         if ("\\".equals(File.separator)) {
@@ -54,7 +69,7 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
         }
         FileInputStream inputStream = new FileInputStream(cssPath);
         XMLWorkerHelper.getInstance().parseXHtml(pdfWriter, document,
-                new ByteArrayInputStream(content), inputStream, StandardCharsets.UTF_8, fontProvider);
+                new ByteArrayInputStream(content), inputStream, StandardCharsets.UTF_8);
         inputStream.close();
         outputStream.close();
         pdfWriter.close();
@@ -71,25 +86,25 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
                 float right = document.getPageSize().getRight() - 48;
                 float top = document.getPageSize().getTop() - 36;
                 float bottom = document.getPageSize().getBottom() + 36;
-                Font font1 = FontFactory.getFont(getFont(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED,
-                        10, Font.NORMAL, BaseColor.BLACK);
+/*                Font font1 = FontFactory.getFont(getFont(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED,
+                        10, Font.NORMAL, BaseColor.BLACK);*/
 
                 if (StringUtils.isNotBlank(header)) {
-                    Phrase headerPhrase = new Phrase(header, font1);
+                    Phrase headerPhrase = new Phrase(header);
                     ColumnText.showTextAligned(writer.getDirectContent(), headerAlignment, headerPhrase, center, top, 0);
                 }
                 if(StringUtils.isNotBlank(footer) && !needPageNo) {
-                    Phrase phrase = new Phrase(footer, font1);
+                    Phrase phrase = new Phrase(footer);
                     ColumnText.showTextAligned(writer.getDirectContent(), footerAlignment, phrase, center, bottom, 0);
                 }
                 if (StringUtils.isNotBlank(footer) && needPageNo) {
-                    Phrase phrase = new Phrase(footer, font1);
+                    Phrase phrase = new Phrase(footer);
                     ColumnText.showTextAligned(writer.getDirectContent(), footerAlignment, phrase, left, bottom, 0);
-                    Phrase pageNumberPh = new Phrase(String.valueOf(document.getPageNumber()), font1);
+                    Phrase pageNumberPh = new Phrase(String.valueOf(document.getPageNumber()));
                     ColumnText.showTextAligned(writer.getDirectContent(), footerAlignment, pageNumberPh, center, bottom, 0);
                 }
                 if (StringUtils.isBlank(footer) && needPageNo) {
-                    Phrase pageNumberPh = new Phrase(String.valueOf(document.getPageNumber()), font1);
+                    Phrase pageNumberPh = new Phrase(String.valueOf(document.getPageNumber()));
                     ColumnText.showTextAligned(writer.getDirectContent(), footerAlignment, pageNumberPh, center, bottom, 0);
                 }
                 super.onEndPage(writer, document);
@@ -97,16 +112,9 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
         };
     }
 
-    public byte[] generate(String templateName, Map<String, Object> params) throws Exception {
-        TemplateEngine templateEngine = new TemplateEngine();
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+    protected byte[] generate(String templateName, Map<String, Object> params) throws Exception {
         Context context = new Context();
         context.setVariables(params);
-        resolver.setCharacterEncoding("UTF-8");
-        resolver.setPrefix("templates/");
-        resolver.setSuffix(".html");
-        resolver.setTemplateMode(TemplateMode.HTML);
-        templateEngine.setTemplateResolver(resolver);
         String htmlString = templateEngine.process(templateName, context);
         return generatePdf(htmlString.getBytes(StandardCharsets.UTF_8));
     }
@@ -114,28 +122,8 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
 
     @Override
     public byte[] generate() throws Exception {
-/*        String templatePath = this.getClass().getResource("/").getPath();
-        templatePath = templatePath.substring(1).replaceAll("%20", " ") + "documents/";
-        String thymeleafPath = getTemplate();
-        String fileName = getTemplate();
-        if (thymeleafPath.contains("/")) {
-            fileName = thymeleafPath.substring(thymeleafPath.lastIndexOf("/") + 1);
-            templatePath += thymeleafPath.substring(0, thymeleafPath.lastIndexOf("/"));
-        }
-        if ("\\".equals(File.separator)) {
-            templatePath = templatePath.replaceAll("/", "\\\\");
-        }
-        if (!templatePath.startsWith(File.separator)) {
-            templatePath = File.separator + templatePath;
-        }*/
-        return generate(getTemplate(), getParameters());
-
-/*        Configuration config = new Configuration(Configuration.VERSION_2_3_30);
-        config.setDirectoryForTemplateLoading(new File(templatePath));
-        Template template = config.getTemplate(fileName, "UTF-8");
-        StringWriter writer = new StringWriter();
-        template.process(getParameters(), writer);
-        writer.close();*/
+        TemplateService templateService = BeanUtils.getBean(TemplateService.class);
+        return generate(templateService.getActualTemplatePath(getTemplate()), getParameters());
     }
 
     public Rectangle getPageSize() {
@@ -170,13 +158,13 @@ public abstract class PdfTemplateGenerator implements IDocGenerator {
         this.footer = footer;
     }
 
-    public String getFont() {
+/*    public String getFont() {
         return font;
     }
 
     public void setFont(String font) {
         this.font = font;
-    }
+    }*/
 
     public int getHeaderAlignment() {
         return headerAlignment;

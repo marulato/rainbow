@@ -41,6 +41,17 @@ public class MasterCodeCache implements ICache<Long, MasterCode> {
         return BeanUtils.deepClone(idCache.getIfPresent(key));
     }
 
+    public List<MasterCode> get(String type) {
+         List<MasterCode> masterCodeList = typeCache.getIfPresent(type);
+         List<MasterCode> cloneList = new ArrayList<>();
+         if (masterCodeList != null) {
+             for (MasterCode masterCode : masterCodeList) {
+                cloneList.add(BeanUtils.deepClone(masterCode));
+             }
+         }
+         return cloneList;
+    }
+
     public MasterCode getByCodeTypeAndCode(String codeType, String code) {
         List<MasterCode> list = typeCache.getIfPresent(codeType);
         if (list != null) {

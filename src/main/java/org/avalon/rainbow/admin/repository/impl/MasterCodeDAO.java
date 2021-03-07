@@ -11,7 +11,7 @@ public class MasterCodeDAO extends CrudDAO<MasterCode, Long, MasterCodeRepositor
 
 
     @Autowired
-    public MasterCodeDAO(MasterCodeRepository crudRepository) {
+    protected MasterCodeDAO(MasterCodeRepository crudRepository) {
         super(crudRepository);
     }
 }

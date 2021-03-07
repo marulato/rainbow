@@ -1,16 +1,15 @@
 package org.avalon.rainbow.admin.repository.impl;
 
-import org.avalon.rainbow.admin.entity.Setting;
-import org.avalon.rainbow.admin.repository.SettingRepository;
+import org.avalon.rainbow.admin.entity.Functionality;
+import org.avalon.rainbow.admin.repository.FunctionRepository;
 import org.avalon.rainbow.common.jpa.CrudDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SettingDAO extends CrudDAO<Setting, Long, SettingRepository> {
-
+public class FunctionDAO extends CrudDAO<Functionality, Long, FunctionRepository> {
     @Autowired
-    protected SettingDAO(SettingRepository crudRepository) {
+    protected FunctionDAO(FunctionRepository crudRepository) {
         super(crudRepository);
     }
 }

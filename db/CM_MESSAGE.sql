@@ -13,3 +13,17 @@ CREATE TABLE CM_MESSAGE
     UPDATED_DM VARCHAR(64)   NOT NULL,
     UPDATED_BY VARCHAR(64)   NOT NULL
 );
+
+INSERT INTO rainbow.CM_MESSAGE
+(ID, MSG_KEY, `TYPE`, MSG_VALUE, DFT_VALUE, REMARKS, CREATED_AT, CREATED_DM, CREATED_BY, UPDATED_AT, UPDATED_DM, UPDATED_BY)
+VALUES(NULL, 'err.default', 'ERC', 'Validation failed', 'Validation failed ', NULL, NOW(), 'system', 'admin', NOW(), 'system', 'admin');
+
+INSERT INTO rainbow.CM_MESSAGE
+(ID, MSG_KEY, `TYPE`, MSG_VALUE, DFT_VALUE, REMARKS, CREATED_AT, CREATED_DM, CREATED_BY, UPDATED_AT, UPDATED_DM, UPDATED_BY)
+VALUES(NULL, 'err.maxlength', 'ERC', 'Content exceeds maximum length', 'Content exceeds maximum length ', NULL, NOW(), 'system', 'admin', NOW(), 'system', 'admin');
+
+INSERT INTO rainbow.CM_MESSAGE
+(ID, MSG_KEY, `TYPE`, MSG_VALUE, DFT_VALUE, REMARKS, CREATED_AT, CREATED_DM, CREATED_BY, UPDATED_AT, UPDATED_DM, UPDATED_BY)
+VALUES(NULL, 'err.invalid', 'ERC', 'Invalid value', 'Invalid value ', NULL, NOW(), 'system', 'admin', NOW(), 'system', 'admin');
+
+

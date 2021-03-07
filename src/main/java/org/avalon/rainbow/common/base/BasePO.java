@@ -23,8 +23,8 @@ public abstract class BasePO implements Serializable {
     public final void createAuditValues(AppContext context) {
         if (context != null) {
             Date now = new Date();
-            setCreatedBy(context.getUserId());
-            setUpdatedBy(context.getUserId());
+            setCreatedBy(context.getUsername());
+            setUpdatedBy(context.getUsername());
             setCreatedDm(context.getDomain());
             setUpdatedDm(context.getDomain());
             setCreatedAt(now);
@@ -35,7 +35,7 @@ public abstract class BasePO implements Serializable {
     public final void updateAuditValues(AppContext context) {
         if (context != null) {
             Date now = new Date();
-            setUpdatedBy(context.getUserId());
+            setUpdatedBy(context.getUsername());
             setUpdatedDm(context.getDomain());
             setUpdatedAt(now);
         }
