@@ -4,4 +4,6 @@ import org.avalon.rainbow.admin.entity.Setting;
 import org.springframework.data.repository.CrudRepository;
 
 public interface SettingRepository extends CrudRepository<Setting, Long> {
+
+    Setting findBySettingKey(String key);
 }

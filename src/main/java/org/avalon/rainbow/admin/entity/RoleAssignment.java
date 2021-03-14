@@ -10,18 +10,27 @@ import java.util.Date;
 @Table(name = "USR_USER_ROLE_ASSIGN")
 public class RoleAssignment extends BasePO {
 
-    private Integer userId;
+    private Long userId;
+    private Long roleId;
     private String status;
     private String remarks;
     private Date effectiveDate;
     private Date expirationDate;
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 
     public String getStatus() {

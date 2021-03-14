@@ -1,6 +1,6 @@
 CREATE TABLE USR_USER
 (
-    ID                    INT PRIMARY KEY AUTO_INCREMENT,
+    ID                    BIGINT PRIMARY KEY AUTO_INCREMENT,
     USERNAME              VARCHAR(64)  NOT NULL UNIQUE,
     DOMAIN                VARCHAR(32)  NOT NULL,
     DISPLAY_NAME          VARCHAR(64)  NOT NULL,

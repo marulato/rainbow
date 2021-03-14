@@ -11,7 +11,7 @@ public abstract class AbstractValidator {
 
     protected abstract void validate(Object object);
 
-    public List<ConstraintViolation> validateObject(Object object) {
+    public List<ConstraintViolation> askForReturn(Object object) {
         validate(object);
         return violations;
     }

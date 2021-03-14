@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 
-public abstract class PdfTemplateGenerator implements IDocGenerator {
+public abstract class PdfGenerator implements IDocGenerator {
 
     private Rectangle pageSize;
     private boolean needPageNo;

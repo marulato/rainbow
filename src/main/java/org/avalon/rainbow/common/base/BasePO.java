@@ -21,24 +21,24 @@ public abstract class BasePO implements Serializable {
     private String updatedDm;
 
     public final void createAuditValues(AppContext context) {
+        Date now = new Date();
         if (context != null) {
-            Date now = new Date();
             setCreatedBy(context.getUsername());
             setUpdatedBy(context.getUsername());
             setCreatedDm(context.getDomain());
             setUpdatedDm(context.getDomain());
-            setCreatedAt(now);
-            setUpdatedAt(now);
         }
+        setCreatedAt(now);
+        setUpdatedAt(now);
     }
 
     public final void updateAuditValues(AppContext context) {
+        Date now = new Date();
         if (context != null) {
-            Date now = new Date();
             setUpdatedBy(context.getUsername());
             setUpdatedDm(context.getDomain());
-            setUpdatedAt(now);
         }
+        setUpdatedAt(now);
     }
 
     public Long getId() {

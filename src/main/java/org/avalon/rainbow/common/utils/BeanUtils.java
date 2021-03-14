@@ -48,4 +48,8 @@ public class BeanUtils implements ApplicationContextAware {
         }
         return null;
     }
+
+    public static ApplicationContext getApplicationContext() {
+        return appContext;
+    }
 }

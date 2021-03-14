@@ -4,6 +4,7 @@ import org.avalon.rainbow.common.base.BasePO;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "USR_ROLE_ACCESS")
@@ -20,6 +21,12 @@ public class RoleAccess extends BasePO {
     private String get;
     private String patch;
     private String isDefault;
+
+    @Transient
+    private String module;
+
+    @Transient
+    private String function;
 
     public Long getRoleId() {
         return roleId;
@@ -91,5 +98,21 @@ public class RoleAccess extends BasePO {
 
     public void setIsDefault(String isDefault) {
         this.isDefault = isDefault;
+    }
+
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
     }
 }

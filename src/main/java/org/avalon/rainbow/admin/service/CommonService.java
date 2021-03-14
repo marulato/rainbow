@@ -3,6 +3,7 @@ package org.avalon.rainbow.admin.service;
 import org.avalon.rainbow.admin.entity.*;
 import org.avalon.rainbow.admin.repository.impl.EmailTransactionDAO;
 import org.avalon.rainbow.admin.repository.impl.MessageDAO;
+import org.avalon.rainbow.admin.repository.impl.SettingDAO;
 import org.avalon.rainbow.common.aop.validation.RequiresValidation;
 import org.avalon.rainbow.common.base.AppContext;
 import org.avalon.rainbow.common.cache.MasterCodeCache;
@@ -19,6 +20,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
 import java.text.MessageFormat;
@@ -82,7 +84,11 @@ public class CommonService {
 
     @RequiresValidation
     public void sendEmail(EmailObject emailObject) {
-        if (!isEmailSendingEnabled()) {
+        if (emailObject == null) {
+            log.warn("Email Object is NULL");
+            return;
+        }
+        if (!isEmailSendingEnabled(emailObject)) {
             log.info("Email Sending is DISABLED");
             return;
         }
@@ -107,8 +113,14 @@ public class CommonService {
         }
     }
 
-    public boolean isEmailSendingEnabled() {
-        return StringUtils.parseBoolean(getSetting("server.email.enabled", "N"));
+    public boolean isEmailSendingEnabled(EmailObject object) {
+        return StringUtils.parseBoolean(getSetting("server.email.enabled", "N")) && object.isActive();
+    }
+
+    @RequiresValidation
+    @Transactional
+    public void saveSetting(Setting setting) {
+        BeanUtils.getBean(SettingDAO.class).save(setting);
     }
 
 
@@ -140,4 +152,5 @@ public class CommonService {
             }
         }
     }
+
 }

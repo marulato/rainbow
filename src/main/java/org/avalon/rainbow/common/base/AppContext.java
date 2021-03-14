@@ -23,7 +23,6 @@ public class AppContext implements Serializable {
     private UserRole currentRole;
     private List<RoleAccess> accesses;
     private List<RoleAssignment> roleAssignments;
-    private List<UserRole> allRoles;
 
     public static final String APP_CONTEXT_KEY = "Legion_Web_Session_Context";
     private static final ThreadLocal<AppContext> localContext = new ThreadLocal<>();
@@ -59,6 +58,10 @@ public class AppContext implements Serializable {
         context.setLoggedIn(isLoggedIn);
         request.getSession().setAttribute(APP_CONTEXT_KEY, context);
         return context;
+    }
+
+    public void invalidate(HttpServletRequest request) {
+        request.getSession().removeAttribute(APP_CONTEXT_KEY);
     }
 
     public void setAppContext() {
@@ -161,11 +164,4 @@ public class AppContext implements Serializable {
         this.currentRole = currentRole;
     }
 
-    public List<UserRole> getAllRoles() {
-        return allRoles;
-    }
-
-    public void setAllRoles(List<UserRole> allRoles) {
-        this.allRoles = allRoles;
-    }
 }

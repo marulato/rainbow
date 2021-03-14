@@ -1,5 +1,7 @@
 package org.avalon.rainbow.common.validation;
 
+import java.lang.reflect.Field;
+
 public class ConstraintViolation {
 
     private String validatedFieldName;
@@ -7,14 +9,26 @@ public class ConstraintViolation {
     private String message;
     private String[] profile;
     private Class<?> validationType;
+    private Class<?> fieldType;
 
-    public ConstraintViolation(String validatedFieldName, Object validatedFieldValue,
-                               String message, String[] profile, Class<?> validationType) {
-        this.validatedFieldName = validatedFieldName;
-        this.validatedFieldValue = validatedFieldValue;
+    public ConstraintViolation(Field field, Object value, String message, String[] profile, Class<?> validationType) {
+        this.validatedFieldName = field.getName();
+        this.validatedFieldValue = value;
         this.message = message;
         this.profile = profile;
         this.validationType = validationType;
+        this.fieldType = field.getType();
+    }
+
+    public ConstraintViolation(String fieldName, Object value, String message, String[] profile, Class<?> validationType) {
+        this.validatedFieldName = fieldName;
+        this.validatedFieldValue = value;
+        this.message = message;
+        this.profile = profile;
+        this.validationType = validationType;
+        if (value != null) {
+            this.fieldType = value.getClass();
+        }
     }
 
     public ConstraintViolation() {}
@@ -57,5 +71,13 @@ public class ConstraintViolation {
 
     public void setValidationType(Class<?> validationType) {
         this.validationType = validationType;
+    }
+
+    public Class<?> getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Class<?> fieldType) {
+        this.fieldType = fieldType;
     }
 }

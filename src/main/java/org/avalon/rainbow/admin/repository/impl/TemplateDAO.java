@@ -8,14 +8,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TemplateDAO extends CrudDAO<Template, Long, TemplateRepository> {
 
-    private final TemplateRepository repository;
 
     protected TemplateDAO(TemplateRepository crudRepository) {
         super(crudRepository);
-        this.repository = crudRepository;
     }
 
     public Template findByPath(String path) {
-        return repository.findByPath(path);
+        return crudRepository.findByPath(path);
     }
 }

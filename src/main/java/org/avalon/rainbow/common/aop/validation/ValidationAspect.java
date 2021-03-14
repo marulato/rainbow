@@ -31,12 +31,12 @@ public class ValidationAspect {
             if (arg instanceof ServletRequest || arg instanceof ServletResponse) {
                 continue;
             }
-            if (ValidationType.ANNOTATION.equals(reqVal.type())) {
+            if (ValidationType.ANNOTATION.equals(reqVal.value())) {
                 List<ConstraintViolation> violations = AnnotationValidator.validate(arg, reqVal.profile());
                 if (!violations.isEmpty()) {
                     throw new ValidationException(violations);
                 }
-            } else if (ValidationType.VALIDATOR.equals(reqVal.type())) {
+            } else if (ValidationType.VALIDATOR.equals(reqVal.value())) {
                 EntityValidator.validate(arg);
             }
         }

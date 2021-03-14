@@ -1,9 +1,9 @@
 CREATE TABLE USR_ROLE_ACCESS
 (
-    ID          INT PRIMARY KEY AUTO_INCREMENT,
-    ROLE_ID     INT         NOT NULL,
-    MODULE_ID   INT         NOT NULL,
-    FUNCTION_ID INT         NOT NULL,
+    ID          BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ROLE_ID     BIGINT         NOT NULL,
+    MODULE_ID   BIGINT         NOT NULL,
+    FUNCTION_ID BIGINT         NOT NULL,
     HTTP_GET    CHAR(1),
     POST        CHAR(1),
     PUT         CHAR(1),

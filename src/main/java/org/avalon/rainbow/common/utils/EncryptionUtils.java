@@ -14,23 +14,39 @@ import java.security.SecureRandom;
 public class EncryptionUtils {
 
     private static final GCMParameterSpec parameterSpec;
+    private static final String AES_KEY;
 
     static {
         SecureRandom random = new SecureRandom();
         byte[] iv = new byte[12];
         random.nextBytes(iv);
         parameterSpec = new GCMParameterSpec(128, iv);
+        AES_KEY = MiscGenerator.generateCodeNumber(32);
     }
 
     public static String encryptPassword(String password) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
-        String hashCode = cyclicHash(5, password);
+        String hashCode = cyclicHash(4, password);
         return encoder.encode(hashCode);
     }
 
     public static boolean matchPassword(String plain, String cipherPwd) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
-        String hashCode = cyclicHash(5, plain);
+        String hashCode = cyclicHash(4, plain);
+        return encoder.matches(hashCode, cipherPwd);
+    }
+
+    public static String encryptToken(String token) throws Exception {
+        return encryptAES(token, AES_KEY, false);
+    }
+
+    public static String decryptToken(String text) throws Exception {
+        return decryptAES(text, AES_KEY, false);
+    }
+
+    public static boolean matchToken(String plain, String cipherPwd) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
+        String hashCode = cyclicHash(1, plain);
         return encoder.matches(hashCode, cipherPwd);
     }
 

@@ -2,6 +2,7 @@ package org.avalon.rainbow.common.validation;
 
 import org.avalon.rainbow.admin.service.CommonService;
 import org.avalon.rainbow.common.utils.*;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,14 +18,15 @@ public class AnnotationValidator {
 
     public static List<ConstraintViolation> validate(Object obj, String profile) throws Exception {
         List<ConstraintViolation> violations = new ArrayList<>();
-        if (obj != null) {
-            Class<?> objClass = obj.getClass();
-            Field[] allFields = objClass.getDeclaredFields();
-            for (Field field : allFields) {
-                field.setAccessible(true);
-                ConstraintField constraintField = new ConstraintField(field, profile, obj);
-               checkAnnotations(constraintField, violations);
-            }
+        if (obj == null) {
+            throw new NullPointerException("Validator class can not be null");
+        }
+        Class<?> objClass = obj.getClass();
+        Field[] allFields = objClass.getDeclaredFields();
+        for (Field field : allFields) {
+            field.setAccessible(true);
+            ConstraintField constraintField = new ConstraintField(field, profile, obj);
+            checkAnnotations(constraintField, violations);
         }
         return violations;
     }
@@ -125,7 +127,7 @@ public class AnnotationValidator {
                 argsList.addAll(Arrays.asList(parameters));
                 boolean result = (boolean) method.invoke(methodInstance, argsList.toArray());
                 if (!result) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(validateWithMethod.errorCode(), validateWithMethod.message()),
                             validateWithMethod.profile(), ValidateWithMethod.class));
                 }
@@ -136,13 +138,13 @@ public class AnnotationValidator {
     }
 
     private static void checkAnnotation_AssertNull(final ConstraintField constraintField,
-                                                final List<ConstraintViolation> violations) throws Exception {
+                                                   final List<ConstraintViolation> violations) throws Exception {
         if (constraintField.isAnnotationPresent(AssertNull.class)) {
             Field field = constraintField.getField();
             AssertNull assertNull = field.getAnnotation(AssertNull.class);
             if (isProfileMatch(constraintField.getInputProfile(), assertNull.profile())) {
                 if (Reflections.getValue(field, constraintField.getInstanceBelongsTo()) != null) {
-                    violations.add(new ConstraintViolation(field.getName(), null,
+                    violations.add(new ConstraintViolation(field, null,
                             getMessage(assertNull.errorCode(), assertNull.message()), assertNull.profile(), NotNull.class));
                 }
             }
@@ -156,7 +158,7 @@ public class AnnotationValidator {
             NotNull notNull = field.getAnnotation(NotNull.class);
             if (isProfileMatch(constraintField.getInputProfile(), notNull.profile())) {
                 if (Reflections.getValue(field, constraintField.getInstanceBelongsTo()) == null) {
-                    violations.add(new ConstraintViolation(field.getName(), null,
+                    violations.add(new ConstraintViolation(field, null,
                             getMessage(notNull.errorCode(), notNull.message()), notNull.profile(), NotNull.class));
                 }
             }
@@ -171,7 +173,7 @@ public class AnnotationValidator {
             if (isProfileMatch(constraintField.getInputProfile(), notEmpty.profile())) {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (value == null || StringUtils.isEmpty(String.valueOf(value))) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(notEmpty.errorCode(), notEmpty.message()), notEmpty.profile(), NotNull.class));
                 }
             }
@@ -186,7 +188,7 @@ public class AnnotationValidator {
             if (isProfileMatch(constraintField.getInputProfile(), notBlank.profile())) {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (value == null || StringUtils.isBlank(String.valueOf(value))) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(notBlank.errorCode(), notBlank.message()), notBlank.profile(), NotBlank.class));
                 }
             }
@@ -202,7 +204,7 @@ public class AnnotationValidator {
                 List<String> members = List.of(memberOf.value());
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !members.contains(String.valueOf(value))) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(memberOf.errorCode(), memberOf.message()), memberOf.profile(), MemberOf.class));
                 }
             }
@@ -210,7 +212,7 @@ public class AnnotationValidator {
     }
 
     private static void checkAnnotation_NotMemberOf(final ConstraintField constraintField,
-                                                 final List<ConstraintViolation> violations) throws Exception {
+                                                    final List<ConstraintViolation> violations) throws Exception {
         if (constraintField.isAnnotationPresent(NotMemberOf.class)) {
             Field field = constraintField.getField();
             NotMemberOf notMemberOf = field.getAnnotation(NotMemberOf.class);
@@ -218,7 +220,7 @@ public class AnnotationValidator {
                 List<String> members = List.of(notMemberOf.value());
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || members.contains(String.valueOf(value))) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(notMemberOf.errorCode(), notMemberOf.message()), notMemberOf.profile(), NotMemberOf.class));
                 }
             }
@@ -226,7 +228,7 @@ public class AnnotationValidator {
     }
 
     private static void checkAnnotation_MatchesPattern(final ConstraintField constraintField,
-                                                 final List<ConstraintViolation> violations) throws Exception {
+                                                       final List<ConstraintViolation> violations) throws Exception {
         if (constraintField.isAnnotationPresent(MatchesPattern.class)) {
             Field field = constraintField.getField();
             MatchesPattern matchesPattern = field.getAnnotation(MatchesPattern.class);
@@ -234,7 +236,7 @@ public class AnnotationValidator {
                 Pattern pattern = Pattern.compile(matchesPattern.pattern());
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !pattern.matcher(String.valueOf(value)).matches()) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(matchesPattern.errorCode(), matchesPattern.message()),
                             matchesPattern.profile(), MatchesPattern.class));
                 }
@@ -243,7 +245,7 @@ public class AnnotationValidator {
     }
 
     private static void checkAnnotation_Length(final ConstraintField constraintField,
-                                                       final List<ConstraintViolation> violations) throws Exception {
+                                               final List<ConstraintViolation> violations) throws Exception {
         if (constraintField.isAnnotationPresent(Length.class)) {
             Field field = constraintField.getField();
             Length length = field.getAnnotation(Length.class);
@@ -254,7 +256,7 @@ public class AnnotationValidator {
                 }
                 if (!(value instanceof String) || ((String) value).length() < length.min()
                         || ((String) value).length() > length.max()) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(length.errorCode(), length.message()), length.profile(), Length.class));
                 }
             }
@@ -262,14 +264,14 @@ public class AnnotationValidator {
     }
 
     private static void checkAnnotation_Email(final ConstraintField constraintField,
-                                                       final List<ConstraintViolation> violations) throws Exception {
+                                              final List<ConstraintViolation> violations) throws Exception {
         if (constraintField.isAnnotationPresent(Email.class)) {
             Field field = constraintField.getField();
             Email email = field.getAnnotation(Email.class);
             if (isProfileMatch(constraintField.getInputProfile(), email.profile())) {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || !ValidationUtils.isValidEmail((String) value)) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(email.errorCode(), email.message()), email.profile(), Email.class));
                 }
             }
@@ -284,7 +286,7 @@ public class AnnotationValidator {
             if (isProfileMatch(constraintField.getInputProfile(), date.profile())) {
                 Object value = Reflections.getValue(field, constraintField.getInstanceBelongsTo());
                 if (!(value instanceof String) || DateUtils.parseDatetime((String) value, date.pattern()) == null) {
-                    violations.add(new ConstraintViolation(field.getName(), value,
+                    violations.add(new ConstraintViolation(field, value,
                             getMessage(date.errorCode(), date.message()), date.profile(), Date.class));
                 }
             }
@@ -305,7 +307,7 @@ public class AnnotationValidator {
                     return;
                 }
             }
-            violations.add(new ConstraintViolation(field.getName(), value,
+            violations.add(new ConstraintViolation(field, value,
                     getMessage(masterCode.errorCode(), masterCode.message()), masterCode.profile(), MasterCode.class));
         }
     }

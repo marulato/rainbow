@@ -7,7 +7,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresValidation {
 
-    ValidationType type() default ValidationType.ANNOTATION;
+    ValidationType value() default ValidationType.ANNOTATION;
 
     String profile() default "";
 }

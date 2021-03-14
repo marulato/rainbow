@@ -13,4 +13,8 @@ public class SettingDAO extends CrudDAO<Setting, Long, SettingRepository> {
     protected SettingDAO(SettingRepository crudRepository) {
         super(crudRepository);
     }
+
+    public Setting findBySettingKey(String settingKey) {
+        return crudRepository.findBySettingKey(settingKey);
+    }
 }

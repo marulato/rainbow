@@ -52,14 +52,19 @@ public class PermissionAspect {
 
     @Before("@annotation(org.avalon.rainbow.common.aop.permission.RequiresRoles)")
     public void checkRequiresRoles(JoinPoint joinPoint) throws Throwable {
-        boolean hasPermission = true;
         Class<?> targetType = joinPoint.getTarget().getClass();
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = targetType.getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
+        AccessControl accessControl = method.getAnnotation(AccessControl.class);
+        if (accessControl != null) {
+            log.info("Annotation: @AccessControl is detected while processing Annotation: @RequireRoles");
+            return;
+        }
         RequiresRoles requiresRoles = method.getAnnotation(RequiresRoles.class);
-
-        List<String> roleIds = Arrays.asList(requiresRoles.value());
         AppContext context = AppContext.getFromWebThread();
+        if (context == null) {
+            throw new AccessDeniedException();
+        }
         UserRole userRole = context.getCurrentRole();
         String[] allowedRoles = requiresRoles.value();
         for (String allowedRole : allowedRoles) {
@@ -93,6 +98,9 @@ public class PermissionAspect {
         if (context == null) {
             throw new AccessDeniedException();
         }
+        if (AccessConst.ROLE_SUPER_ADMIN.equals(context.getCurrentRole().getCode())) {
+            return;
+        }
         boolean hasAccess = false;
 
         for (RoleAccess access : context.getAccesses()) {
@@ -121,6 +129,17 @@ public class PermissionAspect {
         }
 
         if (!hasAccess) {
+            RequiresRoles requiresRoles = method.getAnnotation(RequiresRoles.class);
+            if (requiresRoles != null) {
+                log.info("Insufficient permission in access control, check roles");
+                UserRole userRole = context.getCurrentRole();
+                String[] allowedRoles = requiresRoles.value();
+                for (String allowedRole : allowedRoles) {
+                    if (allowedRole.equals(userRole.getCode())) {
+                        return;
+                    }
+                }
+            }
             throw new AccessDeniedException();
         }
     }

@@ -29,6 +29,7 @@ public class EmailObject implements Serializable {
     private String referenceTbl;
     private Long referenceId;
     private String triggeredBy;
+    private boolean active;
 
     public EmailObject() {
         attachments = new HashMap<>();
@@ -166,5 +167,13 @@ public class EmailObject implements Serializable {
 
     public void setTriggeredBy(String triggeredBy) {
         this.triggeredBy = triggeredBy;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

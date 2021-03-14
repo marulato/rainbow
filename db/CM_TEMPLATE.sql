@@ -1,6 +1,6 @@
 CREATE TABLE CM_TEMPLATE
 (
-    ID               INT PRIMARY KEY AUTO_INCREMENT,
+    ID               BIGINT PRIMARY KEY AUTO_INCREMENT,
     NAME             VARCHAR(50)  NOT NULL,
     TYPE             CHAR(1)      NOT NULL,
     CATEGORY         VARCHAR(64)  NOT NULL,

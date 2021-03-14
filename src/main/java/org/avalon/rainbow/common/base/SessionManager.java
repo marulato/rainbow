@@ -24,8 +24,18 @@ public class SessionManager {
         }
     }
 
+    public static void setAttribute(HttpServletRequest request, String name, Object object) {
+        if (name != null && object != null) {
+            request.getSession().setAttribute(name, object);
+        }
+    }
+
     public static Object getAttribute(String name) {
         return getSession().getAttribute(name);
+    }
+
+    public static Object getAttribute(HttpServletRequest request, String name) {
+        return request.getSession().getAttribute(name);
     }
 
     public static void removeAttribute(String name) {

@@ -9,15 +9,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class MessageDAO extends CrudDAO<Message, Long, MessageRepository> {
 
-    private final MessageRepository repository;
-
     @Autowired
     protected MessageDAO(MessageRepository crudRepository) {
         super(crudRepository);
-        this.repository = crudRepository;
     }
 
     public Message findByKey(String key) {
-        return repository.findMessageByMsgKey(key);
+        return crudRepository.findMessageByMsgKey(key);
     }
 }
