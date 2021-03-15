@@ -45,7 +45,7 @@ public class User extends BasePO {
             if (effectiveDate.after(now)) {
                 this.status = AppConst.ACCOUNT_STATUS_INACTIVE;
             }
-            if (loginFailedTimes >= t) {
+            if (loginFailedTimes >= t && DateUtils.getHoursBetween(lastLoginAttemptDt, now) < 24) {
                 this.status = AppConst.ACCOUNT_STATUS_LOCKED;
             }
         }

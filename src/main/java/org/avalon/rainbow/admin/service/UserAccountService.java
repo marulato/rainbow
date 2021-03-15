@@ -68,7 +68,9 @@ public class UserAccountService {
             UserRole userRole = userRoleDAO.findById(roleAssignment.getRoleId());
             roles.add(userRole);
         }
-        result.setRoles(roles);
+        if (result.isSuccess()) {
+            result.setRoles(roles);
+        }
         trackLoginHistory(result);
 
         return result;
@@ -123,7 +125,7 @@ public class UserAccountService {
         if (t == null || t <= 0) {
             t = 10;
         }
-        if (user.getLoginFailedTimes().equals(t)) {
+        if (user.getLoginFailedTimes() >= t) {
             user.setStatus(AppConst.ACCOUNT_STATUS_LOCKED);
         }
 
