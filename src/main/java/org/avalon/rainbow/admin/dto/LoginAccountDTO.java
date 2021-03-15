@@ -2,15 +2,16 @@ package org.avalon.rainbow.admin.dto;
 
 import org.avalon.rainbow.admin.entity.User;
 import org.avalon.rainbow.admin.repository.impl.UserDAO;
-import org.avalon.rainbow.admin.validator.LoginValidator;
 import org.avalon.rainbow.common.utils.BeanUtils;
-import org.avalon.rainbow.common.validation.Validate;
+import org.avalon.rainbow.common.validation.NotBlank;
+
 import java.io.Serializable;
 
-@Validate(LoginValidator.class)
 public class LoginAccountDTO implements Serializable {
 
+    @NotBlank(message = "Please enter username")
     private String username;
+    @NotBlank(message = "Please enter password")
     private String password;
     private String userAgent;
     private String ip;

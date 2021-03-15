@@ -103,4 +103,15 @@ public class ArrayUtils {
         }
         return false;
     }
+
+    public static int indexOf(Object[] arr, Object item) {
+        if (arr != null && item != null) {
+            for (int i = 0; i < arr.length; i++) {
+                if (item.equals(arr[i])) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
 }

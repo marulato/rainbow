@@ -24,9 +24,11 @@ public class AnnotationValidator {
         Class<?> objClass = obj.getClass();
         Field[] allFields = objClass.getDeclaredFields();
         for (Field field : allFields) {
+            List<ConstraintViolation> fieldViolations = new ArrayList<>();
             field.setAccessible(true);
             ConstraintField constraintField = new ConstraintField(field, profile, obj);
-            checkAnnotations(constraintField, violations);
+            checkAnnotations(constraintField, fieldViolations);
+            violations.addAll(fieldViolations);
         }
         return violations;
     }

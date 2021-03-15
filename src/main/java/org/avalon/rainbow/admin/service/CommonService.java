@@ -4,7 +4,8 @@ import org.avalon.rainbow.admin.entity.*;
 import org.avalon.rainbow.admin.repository.impl.EmailTransactionDAO;
 import org.avalon.rainbow.admin.repository.impl.MessageDAO;
 import org.avalon.rainbow.admin.repository.impl.SettingDAO;
-import org.avalon.rainbow.common.aop.validation.RequiresValidation;
+import org.avalon.rainbow.common.aop.validation.Validate;
+import org.avalon.rainbow.common.aop.validation.Validated;
 import org.avalon.rainbow.common.base.AppContext;
 import org.avalon.rainbow.common.cache.MasterCodeCache;
 import org.avalon.rainbow.common.cache.MessageCache;
@@ -20,7 +21,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
 import java.text.MessageFormat;
@@ -82,8 +82,9 @@ public class CommonService {
         return cache.get(type);
     }
 
-    @RequiresValidation
-    public void sendEmail(EmailObject emailObject) {
+
+    @Validated
+    public void sendEmail(@Validate EmailObject emailObject) {
         if (emailObject == null) {
             log.warn("Email Object is NULL");
             return;
@@ -117,8 +118,6 @@ public class CommonService {
         return StringUtils.parseBoolean(getSetting("server.email.enabled", "N")) && object.isActive();
     }
 
-    @RequiresValidation
-    @Transactional
     public void saveSetting(Setting setting) {
         BeanUtils.getBean(SettingDAO.class).save(setting);
     }

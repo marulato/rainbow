@@ -1,34 +1,30 @@
 package org.avalon.rainbow.admin.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Stopwatch;
 import org.avalon.rainbow.admin.dto.LoginAccountDTO;
-import org.avalon.rainbow.admin.dto.LoginToken;
+import org.avalon.rainbow.admin.dto.LoginResult;
 import org.avalon.rainbow.admin.dto.SelectRoleDTO;
 import org.avalon.rainbow.admin.entity.*;
-import org.avalon.rainbow.admin.event.LoginEvent;
 import org.avalon.rainbow.admin.repository.impl.*;
-import org.avalon.rainbow.admin.validator.LoginValidator;
-import org.avalon.rainbow.common.aop.validation.RequiresValidation;
 import org.avalon.rainbow.common.base.AppContext;
 import org.avalon.rainbow.common.base.RestResponse;
 import org.avalon.rainbow.common.base.SessionManager;
 import org.avalon.rainbow.common.constant.AppConst;
-import org.avalon.rainbow.common.ex.ValidationException;
 import org.avalon.rainbow.common.utils.BeanUtils;
 import org.avalon.rainbow.common.utils.EncryptionUtils;
 import org.avalon.rainbow.common.utils.StringUtils;
-import org.avalon.rainbow.common.validation.ConstraintViolation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -59,13 +55,9 @@ public class UserAccountService {
         this.functionDAO = functionDAO;
     }
 
-    public RestResponse login(LoginAccountDTO loginAccountDTO) throws Exception {
-        List<ConstraintViolation> violations = new LoginValidator().askForReturn(loginAccountDTO);
-        if (!violations.isEmpty()) {
-            throw new ValidationException(violations);
-        }
-
-        RestResponse restResponse = new RestResponse();
+    @Transactional
+    public LoginResult login(LoginAccountDTO loginAccountDTO) {
+        LoginResult result = validateLogin(loginAccountDTO);
         Date now = new Date();
         User user = loginAccountDTO.getUser();
         List<RoleAssignment> roleAssignmentList = roleAssignmentDAO.findByUserIdAndStatus(user.getId(), AppConst.ACCOUNT_STATUS_ACTIVE);
@@ -76,22 +68,13 @@ public class UserAccountService {
             UserRole userRole = userRoleDAO.findById(roleAssignment.getRoleId());
             roles.add(userRole);
         }
-        if (roles.isEmpty()) {
-            restResponse.setStatus(AppConst.RESPONSE_VALIDATION_FAILED);
-            restResponse.setResult(violations);
-            violations.add(new ConstraintViolation("password", null,
-                    "No Active role", null, String.class));
-            throw new ValidationException(violations);
-        } else {
-            restResponse.setStatus(AppConst.RESPONSE_OK);
-            restResponse.setResult(roles);
-        }
+        result.setRoles(roles);
+        trackLoginHistory(result);
 
-        return restResponse;
+        return result;
     }
 
-    @RequiresValidation
-    public RestResponse selectRole(SelectRoleDTO selectRoleDTO , HttpServletRequest request) throws Exception {
+    public RestResponse selectRole(SelectRoleDTO selectRoleDTO , HttpServletRequest request){
         RestResponse restResponse = new RestResponse();
         Date now = new Date();
 
@@ -121,21 +104,17 @@ public class UserAccountService {
         return restResponse;
     }
 
-    @EventListener
-    @Transactional
-    public void onUserLoginEvent(LoginEvent event) {
+    public void trackLoginHistory(LoginResult result) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         Date now = new Date();
-        User user = event.getUser();
+        User user = result.getUser();
         user.setLastLoginAttemptDt(now);
 
-        if (AppConst.ACCOUNT_STATUS_ACTIVE.equals(event.getLoginAction())) {
-            event.setLoginAction(AppConst.YES);
+        if (result.isSuccess()) {
             user.setIsFirstLogin(AppConst.NO);
             user.setLastLoginSuccessDt(now);
             user.setLoginFailedTimes(0);
-        } else {
-            event.setLoginAction(AppConst.NO);
+        } else if (!result.isPwdCorrect()){
             user.setLoginFailedTimes(user.getLoginFailedTimes() + 1);
         }
 
@@ -151,7 +130,7 @@ public class UserAccountService {
         LoginTransaction loginTransaction = new LoginTransaction();
         loginTransaction.setUserId(user.getId());
         loginTransaction.setUsername(user.getUsername());
-        loginTransaction.setLoginStatus(event.getLoginAction());
+        loginTransaction.setLoginStatus(result.isSuccess() ? AppConst.YES : AppConst.NO);
         loginTransaction.setStatus(user.getStatus());
         loginTransaction.setIp(SessionManager.getIpAddress(((ServletRequestAttributes)
                 RequestContextHolder.currentRequestAttributes()).getRequest()));
@@ -164,12 +143,18 @@ public class UserAccountService {
         log.info("onUserLoginEvent: " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
     }
 
-
-    private String generateToken(User user) throws Exception {
-        LoginToken loginToken = new LoginToken();
-        loginToken.setId(user.getId());
-        loginToken.setName(user.getUsername());
-        loginToken.setDate(new Date());
-        return new ObjectMapper().writeValueAsString(loginToken);
+    public LoginResult validateLogin(LoginAccountDTO dto) {
+        User user = dto.getUser();
+        if (user == null) {
+            return LoginResult.incorrectPassword(null);
+        } else {
+            String status = user.updateStatus();
+            boolean isPwdMatch = EncryptionUtils.matchPassword(dto.getPassword(), user.getPassword());
+            if (!isPwdMatch) {
+                return LoginResult.incorrectPassword(user);
+            } else {
+                return LoginResult.status(status, user);
+            }
+        }
     }
 }
